@@ -28,7 +28,7 @@ export default function ShopManagerPage() {
     setLoading(true);
     try {
       const data: any = await shopService.getItems(activeTab);
-      // Lọc client-side để đảm bảo chỉ hiện PET và FRAME (phòng hờ API trả về loại cũ)
+      // Lọc client-side để đảm bảo chỉ hiện PET và FRAME (phòng API trả về loại cũ)
       const filteredData = data.filter((item: any) =>
         ["PET", "FRAME"].includes(item.type),
       );
@@ -143,7 +143,7 @@ export default function ShopManagerPage() {
                     item.type === "PET" ? "bg-orange-50" : "bg-purple-50"
                   }`}
                 >
-                  {/* Nếu là FRAME, hiện avatar giả bên dưới để demo */}
+                  {/* Nếu là FRAME, hiện avatar giả */}
                   {item.type === "FRAME" && (
                     <div className="absolute w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center border-2 border-white">
                       <User className="text-slate-400" />

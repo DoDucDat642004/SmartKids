@@ -1,33 +1,39 @@
 import {
   LayoutDashboard,
-  PieChart, // Tổng quan
+  PieChart,
   Library,
-  BookOpen,
-  FileText,
-  Film,
-  Dumbbell,
-  Book, // Content CMS
-  MonitorPlay,
-  CalendarDays, // Vận hành Lớp
+  School,
+  CalendarDays,
   Users,
+  Baby,
   GraduationCap,
-  Contact,
-  AlertTriangle, // Người dùng
+  AlertTriangle,
   Gamepad2,
-  ShoppingBag,
-  MessageSquare, // Gamification
+  Gift,
+  MessageSquare,
   TicketPercent,
   BellRing,
   Megaphone,
-  DollarSign, // Marketing & Finance
-  Bot,
+  DollarSign,
+  CreditCard,
   Shield,
   History,
-  Settings, // Hệ thống
+  Settings,
+  Newspaper,
+  ClipboardCheck,
+  Package,
+  Receipt,
+  Briefcase,
+  FileSignature,
+  Headphones,
+  FolderOpen,
+  Undo2,
+  AirVentIcon,
+  Bot,
 } from "lucide-react";
 
 export const ADMIN_MENU = [
-  // 1. DASHBOARD
+  // 1. TỔNG QUAN
   {
     group: "TỔNG QUAN",
     items: [
@@ -37,163 +43,167 @@ export const ADMIN_MENU = [
         href: "/admin",
       },
       {
-        name: "Phân tích số liệu",
+        name: "Báo cáo Đào tạo",
         icon: <PieChart size={20} />,
         href: "/admin/analytics",
       },
     ],
   },
 
-  // 2. KHO NỘI DUNG (Content CMS - Nơi soạn bài)
+  // 2. QUẢN LÝ ĐÀO TẠO (Content & Classes)
   {
-    group: "KHO GIÁO TRÌNH (CMS)",
+    group: "QUẢN LÝ ĐÀO TẠO",
     items: [
       {
-        name: "Quản lý Khóa học", // Tạo Course, Unit, Lesson (Game/Video)
+        name: "Kho Khóa học",
         icon: <Library size={20} />,
         href: "/admin/courses",
       },
       {
-        name: "Ngân hàng Câu hỏi", // Soạn câu hỏi trắc nghiệm
-        icon: <BookOpen size={20} />,
-        href: "/admin/questions",
+        name: "Duyệt Game và cuộc thi",
+        icon: <ClipboardCheck size={20} />,
+        href: "/admin/approvals",
       },
       {
-        name: "Thư viện Media", // Quản lý ảnh/video/audio upload
-        icon: <FileText size={20} />,
-        href: "/admin/media",
+        name: "Quản lý Lớp học",
+        icon: <School size={20} />,
+        href: "/admin/classes",
       },
       {
-        name: "Từ điển & Sổ tay", // Flashcards
-        icon: <Book size={20} />,
-        href: "/admin/handbook",
-      },
-      {
-        name: "Kho Luyện tập", // Bài tập tự luyện
-        icon: <Dumbbell size={20} />,
-        href: "/admin/practice",
-      },
-      {
-        name: "Phim & Giải trí",
-        icon: <Film size={20} />,
-        href: "/admin/entertainment",
+        name: "Kho Tài nguyên",
+        icon: <FolderOpen size={20} />,
+        href: "/admin/resources",
       },
     ],
   },
 
-  // 3. VẬN HÀNH (Operation - Nơi tổ chức dạy)
-  {
-    group: "TỔ CHỨC LỚP HỌC (LIVE)",
-    items: [
-      {
-        // Gộp manage-classes và live-classes vào đây
-        name: "Quản lý Lớp Live",
-        icon: <MonitorPlay size={20} />,
-        href: "/admin/manage-classes", // Tạo lớp, xếp giáo viên, thêm học sinh
-      },
-      {
-        name: "Lịch dạy toàn trường",
-        icon: <CalendarDays size={20} />,
-        href: "/admin/schedule",
-      },
-
-      {
-        name: "Blogs",
-        icon: <CalendarDays size={20} />,
-        href: "/admin/manage-posts",
-      },
-    ],
-  },
-
-  // 4. CON NGƯỜI (HRM & CRM)
+  // 3. NGƯỜI DÙNG (Users)
   {
     group: "NGƯỜI DÙNG",
     items: [
       {
         name: "Danh sách Học viên",
         icon: <Users size={20} />,
-        href: "/admin/users",
+        href: "/admin/students",
       },
       {
-        // Di chuyển Tutor về đây cho đúng nhóm người
-        name: "Đội ngũ Giảng viên",
+        name: "Danh sách Phụ huynh",
+        icon: <Baby size={20} />,
+        href: "/admin/parents",
+      },
+    ],
+  },
+
+  // 4. ĐỐI TÁC & GIÁO VIÊN (Teachers)
+  {
+    group: "ĐỐI TÁC & GIÁO VIÊN",
+    items: [
+      {
+        name: "Danh sách Giảng viên",
         icon: <GraduationCap size={20} />,
-        href: "/admin/tutors", // Hoặc filter /admin/users?role=TUTOR
+        href: "/admin/tutors",
       },
       {
-        name: "Báo cáo / Khiếu nại",
-        icon: <AlertTriangle size={20} />,
-        href: "/admin/reports",
+        name: "Tuyển dụng & Duyệt",
+        icon: <Briefcase size={20} />,
+        href: "/admin/recruitment",
       },
       {
-        name: "Hỗ trợ khách hàng",
-        icon: <Contact size={20} />,
-        href: "/admin/support",
-      },
-    ],
-  },
-
-  // 5. GAMIFICATION
-  {
-    group: "GAMIFICATION",
-    items: [
-      {
-        name: "Nhiệm vụ & Level",
-        icon: <Gamepad2 size={20} />,
-        href: "/admin/gamification",
+        name: "Hợp đồng & Lương",
+        icon: <FileSignature size={20} />,
+        href: "/admin/contracts",
       },
       {
-        name: "Cửa hàng vật phẩm",
-        icon: <ShoppingBag size={20} />,
-        href: "/admin/shop",
-      },
-      {
-        name: "Cộng đồng & Blog",
+        name: "Yêu cầu & Đề xuất",
         icon: <MessageSquare size={20} />,
-        href: "/admin/community",
+        href: "/admin/requests",
       },
     ],
   },
 
-  // 6. KINH DOANH (Business)
+  // 5. KINH DOANH (Business)
   {
-    group: "KINH DOANH & MARKETING",
+    group: "KINH DOANH",
     items: [
       {
-        name: "Doanh thu & Đơn hàng",
-        icon: <DollarSign size={20} />,
-        href: "/admin/finance",
+        name: "Quản lý Gói cước",
+        icon: <Package size={20} />,
+        href: "/admin/packages",
       },
       {
-        name: "Mã giảm giá (Voucher)",
-        icon: <TicketPercent size={20} />,
-        href: "/admin/vouchers",
+        name: "Quản lý Đăng ký",
+        icon: <CreditCard size={20} />,
+        href: "/admin/subscriptions",
       },
       {
-        name: "Chiến dịch Thông báo",
-        icon: <BellRing size={20} />,
-        href: "/admin/notifications",
+        name: "Giao dịch & Hoàn tiền",
+        icon: <Receipt size={20} />,
+        href: "/admin/transactions",
+      },
+    ],
+  },
+
+  // 6. MARKETING & TRUYỀN THÔNG
+  {
+    group: "MARKETING & TRUYỀN THÔNG",
+    items: [
+      {
+        name: "Tin tức & Blog",
+        icon: <Newspaper size={20} />,
+        href: "/admin/posts",
       },
       {
         name: "Banner Quảng cáo",
         icon: <Megaphone size={20} />,
         href: "/admin/banners",
       },
+      {
+        name: "Thông báo hệ thống",
+        icon: <BellRing size={20} />,
+        href: "/admin/notifications",
+      },
+      {
+        name: "Mã giảm giá",
+        icon: <TicketPercent size={20} />,
+        href: "/admin/vouchers",
+      },
     ],
   },
 
-  // 7. HỆ THỐNG (System)
+  // 7. GAMIFICATION & CỘNG ĐỒNG
   {
-    group: "CẤU HÌNH HỆ THỐNG",
+    group: "GAMIFICATION",
     items: [
       {
-        name: "Cấu hình AI Teacher",
-        icon: <Bot size={20} />,
-        href: "/admin/ai-config",
+        name: "Level & Huy hiệu",
+        icon: <Gamepad2 size={20} />,
+        href: "/admin/gamification",
+      },
+      {
+        name: "Cửa hàng đổi quà",
+        icon: <Gift size={20} />,
+        href: "/admin/shop",
+      },
+      {
+        name: "Kiểm duyệt Cộng đồng",
+        icon: <Shield size={20} />,
+        href: "/admin/community",
+      },
+    ],
+  },
+
+  // 8. HỖ TRỢ & HỆ THỐNG
+  {
+    group: "HỆ THỐNG & HỖ TRỢ",
+    items: [
+      {
+        name: "Ticket Hỗ trợ",
+        icon: <Headphones size={20} />,
+        href: "/admin/support",
       },
       {
         name: "Phân quyền (Roles)",
-        icon: <Shield size={20} />,
+        icon: <Users size={20} />,
         href: "/admin/roles",
       },
       {
@@ -202,7 +212,12 @@ export const ADMIN_MENU = [
         href: "/admin/audit-logs",
       },
       {
-        name: "Cài đặt chung",
+        name: "Cài đặt AI",
+        icon: <Bot size={20} />,
+        href: "/admin/ai-management",
+      },
+      {
+        name: "Cài đặt hệ thống",
         icon: <Settings size={20} />,
         href: "/admin/settings",
       },

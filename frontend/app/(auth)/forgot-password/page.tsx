@@ -40,7 +40,6 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    // BG Gradient Tím
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       <div className="bg-white w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-white/50">
         {/* --- CỘT TRÁI --- */}

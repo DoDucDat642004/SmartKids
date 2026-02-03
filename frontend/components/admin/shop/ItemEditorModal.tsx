@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { shopService } from "@/services/shop.service";
-import LottiePet from "@/components/clients/ui/LottiePet";
+import LottiePet from "@/components/student/ui/LottiePet";
 import { courseService } from "@/services/course.service";
 
 export default function ItemEditorModal({

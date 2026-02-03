@@ -158,12 +158,11 @@ export default function MediaUploadModal({
 
   if (!isOpen) return null;
 
-  // --- GIAO DIỆN NỘI DUNG (TÁCH RIÊNG) ---
+  // --- GIAO DIỆN NỘI DUNG ---
   const content = (
     <div
       className={`bg-white flex flex-col overflow-hidden h-full ${isEmbedded ? "" : "rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh]"}`}
     >
-      {/* Chỉ hiện Header nếu KHÔNG phải nhúng */}
       {!isEmbedded && (
         <div className="p-4 border-b flex justify-between items-center bg-gray-50 shrink-0">
           <h2 className="font-bold text-lg text-slate-800">

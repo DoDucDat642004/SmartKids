@@ -311,7 +311,7 @@ export default function AuditLogPage() {
                   </pre>
                 </div>
 
-                {/* CỘT PHẢI: Dữ liệu Mới hoặc Kết quả trả về */}
+                {/* CỘT PHẢI: Kết quả trả về */}
                 <div className="bg-green-50 p-4 rounded-xl border border-green-100">
                   <h4 className="text-xs font-bold text-green-600 uppercase mb-2">
                     {selectedLog.detail.new

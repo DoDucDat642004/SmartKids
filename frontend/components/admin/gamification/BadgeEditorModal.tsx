@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Save, Loader2, Award, Star } from "lucide-react";
 import { gamificationService } from "@/services/gamification.service";
-import MediaUploader from "../practice/forms/MediaUploader";
+import MediaUploader from "../../teacher/practice/forms/MediaUploader";
 
 export default function BadgeEditorModal({
   isOpen,
