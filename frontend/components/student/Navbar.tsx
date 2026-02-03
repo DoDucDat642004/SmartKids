@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LogOut,
-  User as UserIcon,
   CreditCard,
   Menu,
   Cat,
@@ -16,31 +15,27 @@ import {
   Lightbulb,
   GraduationCap,
   Target,
-  Newspaper,
-  Library,
   MessageCircle,
   MonitorPlay,
   Phone,
-  ShieldCheck,
   Search,
   X,
   Sparkles,
   Bell,
   Tag,
   Clock,
-  CheckCircle2,
   Trophy,
   ClipboardList,
   BarChart3,
   MessageSquare,
   PlayCircle,
+  ShieldCheck,
 } from "lucide-react";
 import { userService } from "@/services/user.service";
 
 // Components
 import InventoryModal from "@/components/student/course/InventoryModal";
 import AITutorWidget from "./AITutorWidget";
-import path from "path";
 
 // --- MOCK NOTIFICATIONS ---
 const MOCK_NOTIFICATIONS = [
@@ -262,7 +257,7 @@ export default function Navbar() {
         <div className="container mx-auto px-4 lg:px-6 h-14 flex items-center justify-between">
           {/* 1. LOGO */}
           <Link
-            href="/home"
+            href="/"
             className="flex items-center gap-3 mr-8 shrink-0 group"
           >
             <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/20 group-hover:bg-blue-800 transition-colors transform group-hover:scale-105 duration-300">
@@ -533,14 +528,7 @@ export default function Navbar() {
                     </div>
 
                     <div className="space-y-1 mb-3">
-                      <Link
-                        href="/parents"
-                        onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-50 transition"
-                      >
-                        <ShieldCheck size={18} className="text-slate-400" /> Góc
-                        phụ huynh
-                      </Link>
+                      {/* Đã xóa link Góc phụ huynh ở đây */}
                       <Link
                         href="/subscription"
                         onClick={() => setShowUserMenu(false)}

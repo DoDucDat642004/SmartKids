@@ -1,278 +1,294 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, X, Loader2, ShieldCheck, ArrowRight } from "lucide-react";
+import { Check, X, Loader2, ShieldCheck, ArrowRight, Zap } from "lucide-react";
+
+// --- TYPES ---
+interface PackageBenefit {
+  text: string;
+  included: boolean;
+}
+
+interface Package {
+  id: string;
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number; 
+  icon: string;
+  isPopular?: boolean;
+  theme: "basic" | "standard" | "premium";
+  features: PackageBenefit[];
+}
 
 // --- MOCK DATA ---
-const MOCK_PACKAGES = [
+const PACKAGES_DATA: Package[] = [
   {
-    _id: "pkg_free",
+    id: "pkg_free",
     name: "Bé Tập Sự",
-    price: 0,
-    originalPrice: 0,
-    duration: 9999,
-    badge: "",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
     icon: "🐣",
-    theme: "gray",
-    benefits: [
-      "Học 2 bài miễn phí mỗi ngày",
-      "Truy cập kho từ vựng cơ bản",
-      "Tham gia bảng xếp hạng",
-    ],
-    limitations: [
-      "Không có trợ lý AI",
-      "Giới hạn bài tập nâng cao",
-      "Không có báo cáo chi tiết",
+    theme: "basic",
+    features: [
+      { text: "Học 2 bài miễn phí mỗi ngày", included: true },
+      { text: "Truy cập kho từ vựng cơ bản", included: true },
+      { text: "Tham gia bảng xếp hạng tuần", included: true },
+      { text: "Trợ lý AI (Gia sư ảo)", included: false },
+      { text: "Báo cáo học tập chi tiết", included: false },
+      { text: "Chứng chỉ hoàn thành", included: false },
     ],
   },
   {
-    _id: "pkg_monthly",
+    id: "pkg_explorer",
     name: "Nhà Thám Hiểm",
-    price: 99000,
-    originalPrice: 150000,
-    duration: 30,
-    badge: "Tiết kiệm",
+    monthlyPrice: 149000,
+    yearlyPrice: 1188000, // Tương đương 99k/tháng
     icon: "🚀",
-    theme: "blue",
-    benefits: [
-      "Mở khóa TOÀN BỘ bài học",
-      "Không giới hạn thời gian học",
-      "Báo cáo học tập cơ bản",
-      "Tắt quảng cáo",
+    isPopular: true,
+    theme: "standard",
+    features: [
+      { text: "Mở khóa TOÀN BỘ bài học", included: true },
+      { text: "Không giới hạn thời gian học", included: true },
+      { text: "Tắt toàn bộ quảng cáo", included: true },
+      { text: "Trợ lý AI (50 lượt/ngày)", included: true },
+      { text: "Báo cáo chi tiết", included: true },
+      { text: "Chứng chỉ hoàn thành", included: false },
     ],
-    limitations: ["Giới hạn 50 lượt chat AI/ngày"],
   },
   {
-    _id: "pkg_yearly",
+    id: "pkg_hero",
     name: "Siêu Anh Hùng",
-    price: 999000,
-    originalPrice: 1800000,
-    duration: 365,
-    badge: "POPULAR",
+    monthlyPrice: 299000,
+    yearlyPrice: 2388000, // Tương đương 199k/tháng
     icon: "💎",
-    theme: "purple",
-    benefits: [
-      "Tất cả quyền lợi gói Thám Hiểm",
-      "Chat AI không giới hạn",
-      "Gia sư 1:1 (2 buổi/tháng)",
-      "Bộ quà tặng Sticker độc quyền",
-      "Huy hiệu VIP lấp lánh",
+    theme: "premium",
+    features: [
+      { text: "Tất cả quyền lợi gói Thám Hiểm", included: true },
+      { text: "Chat AI không giới hạn", included: true },
+      { text: "Gia sư 1:1 (2 buổi/tháng)", included: true },
+      { text: "Bộ quà tặng Sticker độc quyền", included: true },
+      { text: "Huy hiệu VIP lấp lánh", included: true },
+      { text: "Hỗ trợ ưu tiên 24/7", included: true },
     ],
-    limitations: [],
   },
 ];
 
 export default function SubscriptionPage() {
-  const router = useRouter(); // Khởi tạo router
-  const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
-  const [packages, setPackages] = useState<any[]>([]);
+  const router = useRouter();
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Giả lập fetch API
-    const fetchPackages = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setPackages(MOCK_PACKAGES);
-        setLoading(false);
-      }, 800);
-    };
-    fetchPackages();
+    // Giả lập loading để tạo hiệu ứng mượt mà
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Chuyển hướng sang Checkout
-  const handleSubscribe = (pack: any) => {
-    // Tạo URL params chứa thông tin gói để trang Checkout hiển thị
+  // Tính toán giá hiển thị dựa trên billingCycle
+  const displayPackages = useMemo(() => {
+    return PACKAGES_DATA.map((pkg) => {
+      const price = billingCycle === "yearly" ? pkg.yearlyPrice : pkg.monthlyPrice;
+      // Nếu là gói năm, tính giá chia đều theo tháng để so sánh
+      const pricePerMonth = billingCycle === "yearly" && pkg.yearlyPrice > 0 
+        ? Math.round(pkg.yearlyPrice / 12) 
+        : pkg.monthlyPrice;
+      
+      // Tính % tiết kiệm
+      const savings = pkg.monthlyPrice > 0 
+        ? Math.round(((pkg.monthlyPrice * 12 - pkg.yearlyPrice) / (pkg.monthlyPrice * 12)) * 100)
+        : 0;
+
+      return { ...pkg, price, pricePerMonth, savings };
+    });
+  }, [billingCycle]);
+
+  const handleSubscribe = (pkg: any) => {
+    if (pkg.price === 0) return; // Gói Free không cần thanh toán
+
     const params = new URLSearchParams({
       type: "PACKAGE",
-      id: pack._id,
-      name: pack.name,
-      price: pack.price.toString(),
-      desc: `Gói ${pack.name} - Thời hạn ${pack.duration === 365 ? "1 Năm" : "1 Tháng"}`,
-      image: pack.icon, // Truyền icon/emoji sang
+      id: pkg.id,
+      name: pkg.name,
+      price: pkg.price.toString(),
+      cycle: billingCycle,
+      desc: `Đăng ký gói ${pkg.name} (${billingCycle === "yearly" ? "1 năm" : "1 tháng"})`,
     });
 
-    // Chuyển hướng
     router.push(`/checkout?${params.toString()}`);
   };
 
-  const formatMoney = (amount: number) =>
-    new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(amount);
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] font-sans pb-20">
-      {/* 1. HEADER HERO */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white pt-16 pb-32 px-4 rounded-b-[3rem] text-center relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce">
-            💎
-          </div>
-          <div className="absolute bottom-20 right-20 text-6xl animate-pulse">
-            🚀
-          </div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-[#F8FAFC] font-sans pb-24">
+      
+      {/* 1. HERO HEADER */}
+      <div className="relative bg-[#0F172A] text-white pt-20 pb-48 px-6 rounded-b-[4rem] overflow-hidden shadow-2xl">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full blur-[128px]"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-500 rounded-full blur-[128px]"></div>
         </div>
 
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <span className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold border border-white/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
-            ✨ Nâng cấp tài khoản ngay hôm nay
-          </span>
-          <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight drop-shadow-md">
-            Cửa Hàng Siêu Năng Lực
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-sm font-bold text-blue-200 mb-6 animate-in fade-in slide-in-from-bottom-4">
+            <Zap size={16} className="text-yellow-400 fill-yellow-400" />
+            Nâng cấp tài khoản - Mở khóa tiềm năng
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+            Chọn Gói Cước Phù Hợp <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              Cho Hành Trình Của Bé
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-indigo-100 font-medium max-w-2xl mx-auto">
-            Mở khóa toàn bộ tính năng, học không giới hạn và nhận huy hiệu VIP
-            độc quyền!
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Đầu tư cho tương lai với chi phí hợp lý. Hủy đăng ký bất kỳ lúc nào. Không có phí ẩn.
           </p>
         </div>
       </div>
 
-      {/* 2. TOGGLE SWITCH */}
-      <div className="flex justify-center -mt-8 relative z-20 mb-12">
-        <div className="bg-white p-1.5 rounded-full shadow-xl border border-slate-100 flex items-center">
-          <button
-            onClick={() => setBilling("monthly")}
-            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
-              billing === "monthly"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "text-slate-500 hover:bg-slate-50"
-            }`}
-          >
-            Theo Tháng
-          </button>
-          <button
-            onClick={() => setBilling("yearly")}
-            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
-              billing === "yearly"
-                ? "bg-pink-500 text-white shadow-md"
-                : "text-slate-500 hover:bg-slate-50"
-            }`}
-          >
-            Theo Năm{" "}
-            <span className="bg-white text-pink-600 text-[10px] px-1.5 py-0.5 rounded shadow-sm">
-              -30%
-            </span>
-          </button>
-        </div>
-      </div>
+      {/* 2. MAIN CONTENT - OVERLAPPING HEADER */}
+      <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-20">
+        
+        {/* Billing Toggle */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-white/90 backdrop-blur-xl p-1.5 rounded-full shadow-xl border border-white/20 inline-flex relative">
+            {/* Animation Background for Toggle */}
+            <div 
+              className={`absolute top-1.5 bottom-1.5 rounded-full bg-slate-900 transition-all duration-300 ease-out shadow-md
+              ${billingCycle === "monthly" ? "left-1.5 w-[140px]" : "left-[146px] w-[160px]"}`}
+            ></div>
 
-      {/* 3. PRICING CARDS */}
-      <div className="max-w-6xl mx-auto px-4">
+            <button
+              onClick={() => setBillingCycle("monthly")}
+              className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-colors duration-300 w-[140px]
+              ${billingCycle === "monthly" ? "text-white" : "text-slate-500 hover:text-slate-900"}`}
+            >
+              Theo Tháng
+            </button>
+            <button
+              onClick={() => setBillingCycle("yearly")}
+              className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-colors duration-300 w-[160px] flex items-center justify-center gap-2
+              ${billingCycle === "yearly" ? "text-white" : "text-slate-500 hover:text-slate-900"}`}
+            >
+              Theo Năm
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-black uppercase transition-colors
+                ${billingCycle === "yearly" ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-sm" : "bg-green-100 text-green-700"}`}>
+                -30%
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Pricing Cards Grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-            <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
-            <p>Đang tải gói cước...</p>
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+            <p className="text-slate-500 font-medium">Đang tải thông tin gói cước...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            {packages.map((pack) => {
-              const isVip = pack.theme === "purple";
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {displayPackages.map((pkg) => {
+              const isPremium = pkg.theme === "premium";
+              const isStandard = pkg.theme === "standard";
+
               return (
                 <div
-                  key={pack._id}
-                  className={`relative bg-white rounded-3xl transition-all duration-300 flex flex-col h-full border-2 ${
-                    isVip
-                      ? "border-purple-500 shadow-2xl scale-105 z-10"
-                      : "border-slate-100 shadow-lg hover:shadow-xl hover:-translate-y-1"
+                  key={pkg.id}
+                  className={`relative flex flex-col rounded-[2rem] transition-all duration-300 group
+                  ${isPremium 
+                    ? "bg-slate-900 text-white shadow-2xl shadow-purple-900/20 scale-105 border-2 border-purple-500/50 z-10" 
+                    : "bg-white text-slate-800 shadow-xl shadow-slate-200/50 border border-slate-100 hover:-translate-y-2"
                   }`}
                 >
-                  {/* Ribbon Badge */}
-                  {pack.badge && (
-                    <div className="absolute top-0 right-0 left-0 text-center -mt-4">
-                      <span
-                        className={`px-4 py-1 rounded-full text-xs font-black text-white uppercase tracking-wider shadow-md ${
-                          isVip
-                            ? "bg-gradient-to-r from-pink-500 to-purple-600"
-                            : "bg-blue-500"
-                        }`}
-                      >
-                        {pack.badge}
+                  {/* Badge Popular */}
+                  {pkg.isPopular && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                      <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1">
+                        <ShieldCheck size={14} /> Khuyên dùng
                       </span>
                     </div>
                   )}
 
                   <div className="p-8 flex-1">
-                    <div className="text-5xl mb-4 text-center">{pack.icon}</div>
-                    <h3 className="text-2xl font-black text-slate-800 text-center mb-2">
-                      {pack.name}
-                    </h3>
+                    {/* Header Card */}
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h3 className={`text-xl font-bold mb-1 ${isPremium ? "text-white" : "text-slate-800"}`}>
+                          {pkg.name}
+                        </h3>
+                        <p className={`text-sm ${isPremium ? "text-slate-400" : "text-slate-500"}`}>
+                          {pkg.theme === 'basic' ? 'Dành cho người mới bắt đầu' : pkg.theme === 'standard' ? 'Tăng tốc học tập' : 'Trải nghiệm toàn diện nhất'}
+                        </p>
+                      </div>
+                      <div className="text-4xl">{pkg.icon}</div>
+                    </div>
 
-                    <div className="text-center mb-6">
-                      <span className="text-4xl font-black text-slate-900">
-                        {formatMoney(pack.price)}
-                      </span>
-                      {pack.price > 0 && (
-                        <span className="text-slate-400 text-sm font-medium">
-                          /{pack.duration === 365 ? "năm" : "tháng"}
+                    {/* Price Section */}
+                    <div className="mb-8">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-extrabold tracking-tight">
+                          {formatCurrency(billingCycle === "yearly" && pkg.price > 0 ? pkg.pricePerMonth : pkg.price)}
                         </span>
-                      )}
-                      {pack.originalPrice > pack.price && (
-                        <div className="text-slate-400 text-sm line-through mt-1">
-                          {formatMoney(pack.originalPrice)}
+                        {pkg.price > 0 && (
+                          <span className={`text-sm font-medium ${isPremium ? "text-slate-400" : "text-slate-500"}`}>
+                            /tháng
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Yearly Info */}
+                      {billingCycle === "yearly" && pkg.price > 0 && (
+                        <div className={`mt-2 text-sm font-medium px-3 py-1 rounded-lg w-fit
+                          ${isPremium ? "bg-white/10 text-green-400" : "bg-green-50 text-green-700"}`}>
+                          Thanh toán {formatCurrency(pkg.price)}/năm (Tiết kiệm {pkg.savings}%)
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-4 mb-8">
-                      {pack.benefits.map((item: string, idx: number) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 text-sm text-slate-600"
-                        >
-                          <div
-                            className={`p-0.5 rounded-full shrink-0 mt-0.5 ${
-                              isVip
-                                ? "bg-green-100 text-green-600"
-                                : "bg-slate-100 text-slate-500"
-                            }`}
-                          >
-                            <Check size={12} strokeWidth={4} />
+                    {/* Divider */}
+                    <div className={`h-px w-full mb-8 ${isPremium ? "bg-slate-700" : "bg-slate-100"}`}></div>
+
+                    {/* Features List */}
+                    <ul className="space-y-4">
+                      {pkg.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-3 text-sm">
+                          <div className={`mt-0.5 p-0.5 rounded-full shrink-0
+                            ${feature.included 
+                              ? (isPremium ? "bg-green-500/20 text-green-400" : "bg-blue-50 text-blue-600") 
+                              : (isPremium ? "bg-slate-800 text-slate-600" : "bg-slate-100 text-slate-400")}`}>
+                            {feature.included ? <Check size={12} strokeWidth={3} /> : <X size={12} strokeWidth={3} />}
                           </div>
-                          <span className="font-medium">{item}</span>
-                        </div>
+                          <span className={`font-medium ${feature.included ? (isPremium ? "text-slate-200" : "text-slate-700") : (isPremium ? "text-slate-600" : "text-slate-400")}`}>
+                            {feature.text}
+                          </span>
+                        </li>
                       ))}
-                      {pack.limitations?.map((item: string, idx: number) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 text-sm text-slate-400 opacity-70"
-                        >
-                          <div className="p-0.5 rounded-full shrink-0 mt-0.5 bg-slate-100">
-                            <X size={12} strokeWidth={4} />
-                          </div>
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                    </ul>
                   </div>
 
+                  {/* Action Button */}
                   <div className="p-8 pt-0 mt-auto">
                     <button
-                      onClick={() => handleSubscribe(pack)}
-                      disabled={pack.price === 0}
-                      className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 group ${
-                        pack.price === 0
-                          ? "bg-slate-100 text-slate-400 cursor-default shadow-none"
-                          : isVip
-                            ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-purple-200 hover:scale-[1.02]"
-                            : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200"
-                      }`}
+                      onClick={() => handleSubscribe(pkg)}
+                      disabled={pkg.price === 0}
+                      className={`w-full py-4 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 group
+                        ${pkg.price === 0
+                          ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          : isPremium
+                            ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-900/40 hover:shadow-purple-900/60 hover:scale-[1.02]"
+                            : "bg-slate-900 hover:bg-blue-600 text-white hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02]"
+                        }`}
                     >
-                      {pack.price === 0 ? "Đang sử dụng" : "Nâng cấp ngay"}
-                      {pack.price > 0 && (
-                        <ArrowRight
-                          size={20}
-                          className="group-hover:translate-x-1 transition-transform"
-                        />
-                      )}
+                      {pkg.price === 0 ? "Gói hiện tại" : "Chọn gói này"}
+                      {pkg.price > 0 && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>}
                     </button>
-                    {isVip && (
-                      <p className="text-center text-xs text-purple-500 font-medium mt-3 flex items-center justify-center gap-1">
-                        <ShieldCheck size={12} /> Đảm bảo hoàn tiền trong 7 ngày
+                    {isPremium && (
+                      <p className="text-center text-[10px] text-slate-400 mt-4 flex items-center justify-center gap-1.5 opacity-80">
+                        <ShieldCheck size={12} /> Cam kết hoàn tiền trong 7 ngày đầu
                       </p>
                     )}
                   </div>
@@ -282,15 +298,21 @@ export default function SubscriptionPage() {
           </div>
         )}
 
-        {/* 4. FOOTER */}
-        <div className="mt-16 text-center">
-          <Link
-            href="/home"
-            className="text-slate-500 font-bold hover:text-indigo-600 transition underline underline-offset-4"
-          >
-            Để sau, quay lại trang chủ
-          </Link>
+        {/* 3. FAQ SECTION */}
+        <div className="mt-24 max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">Câu hỏi thường gặp</h2>
+          <div className="space-y-4 text-left">
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+              <h3 className="font-bold text-slate-800 mb-2">Tôi có thể hủy gói bất cứ lúc nào không?</h3>
+              <p className="text-sm text-slate-600">Được chứ! Bạn có thể hủy gia hạn bất kỳ lúc nào trong phần cài đặt tài khoản. Bạn vẫn sẽ được sử dụng tính năng VIP cho đến hết chu kỳ đã thanh toán.</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+              <h3 className="font-bold text-slate-800 mb-2">Gói gia sư 1:1 hoạt động như thế nào?</h3>
+              <p className="text-sm text-slate-600">Với gói Siêu Anh Hùng, bạn sẽ nhận được 2 buổi học trực tuyến (30 phút/buổi) mỗi tháng với giáo viên bản ngữ hoặc giáo viên Việt Nam trình độ cao.</p>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );
